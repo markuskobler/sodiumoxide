@@ -26,31 +26,31 @@ extern {
     pub fn crypto_pwhash_scryptsalsa208sha256(
         out: *mut u8,
         outlen: c_ulonglong,
-        passwd: *const c_char,
+        passwd: *const u8,
         passwdlen: c_ulonglong,
         salt: *const [u8; crypto_pwhash_scryptsalsa208sha256_SALTBYTES],
         opslimit: c_ulonglong,
-        memlimit: size_t) -> c_int;
+        memlimit: c_ulonglong) -> c_int;
     pub fn crypto_pwhash_scryptsalsa208sha256_str(
-        out: *mut [c_char; crypto_pwhash_scryptsalsa208sha256_STRBYTES],
-        passwd: *const c_char,
+        out: *mut [u8; crypto_pwhash_scryptsalsa208sha256_STRBYTES],
+        passwd: *const u8,
         passwdlen: c_ulonglong,
         opslimit: c_ulonglong,
-        memlimit: size_t) -> c_int;
+        memlimit: c_ulonglong) -> c_int;
     pub fn crypto_pwhash_scryptsalsa208sha256_str_verify(
-        str_: *const [c_char; crypto_pwhash_scryptsalsa208sha256_STRBYTES],
-        passwd: *const c_char,
+        str_: *const [u8; crypto_pwhash_scryptsalsa208sha256_STRBYTES],
+        passwd: *const u8,
         passwdlen: c_ulonglong) -> c_int;
     pub fn crypto_pwhash_scryptsalsa208sha256_ll(
         passwd: *const u8,
-        passwdlen: size_t,
+        passwdlen: c_ulonglong,
         salt: *const u8,
-        saltlen: size_t,
+        saltlen: c_ulonglong,
         N: u64,
         r: u32,
         p: u32,
         buf: *mut u8,
-        buflen: size_t) -> c_int;
+        buflen: c_ulonglong) -> c_int;
 }
 
 
@@ -107,18 +107,18 @@ fn test_crypto_pwhash_scryptsalsa208sha256_str() {
     let ret_hash = unsafe {
         crypto_pwhash_scryptsalsa208sha256_str(
             &mut hashed_password,
-            password.as_ptr() as *const c_char,
+            password.as_ptr(),
             password.len() as c_ulonglong,
             crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_INTERACTIVE
                 as c_ulonglong,
             crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_INTERACTIVE
-                as size_t)
+                as c_ulonglong)
     };
     assert!(ret_hash == 0);
     let ret_verify = unsafe {
         crypto_pwhash_scryptsalsa208sha256_str_verify(
             &hashed_password,
-            password.as_ptr() as *const c_char,
+            password.as_ptr(),
             password.len() as c_ulonglong)
     };
     assert!(ret_verify == 0);
@@ -142,14 +142,14 @@ fn test_crypto_pwhash_scryptsalsa208sha256_ll_1() {
                     0xcf, 0x35, 0xe2, 0x0c, 0x38, 0xd1, 0x89, 0x06];
     let ret = unsafe {
         crypto_pwhash_scryptsalsa208sha256_ll(password.as_ptr(),
-                                              password.len() as size_t,
+                                              password.len() as c_ulonglong,
                                               salt.as_ptr(),
-                                              salt.len() as size_t,
+                                              salt.len() as c_ulonglong,
                                               n,
                                               r,
                                               p,
                                               buf.as_mut_ptr(),
-                                              buf.len() as size_t)
+                                              buf.len() as c_ulonglong)
     };
     assert!(ret == 0);
     assert!(buf[0..] == expected[0..]);
@@ -173,14 +173,14 @@ fn test_crypto_pwhash_scryptsalsa208sha256_ll_2() {
                     0x83, 0x60, 0xcb, 0xdf, 0xa2, 0xcc, 0x06, 0x40];
     let ret = unsafe {
         crypto_pwhash_scryptsalsa208sha256_ll(password.as_ptr(),
-                                              password.len() as size_t,
+                                              password.len() as c_ulonglong,
                                               salt.as_ptr(),
-                                              salt.len() as size_t,
+                                              salt.len() as c_ulonglong,
                                               n,
                                               r,
                                               p,
                                               buf.as_mut_ptr(),
-                                              buf.len() as size_t)
+                                              buf.len() as c_ulonglong)
     };
     assert!(ret == 0);
     assert!(buf[0..] == expected[0..]);
@@ -204,14 +204,14 @@ fn test_crypto_pwhash_scryptsalsa208sha256_ll_3() {
                     0xdf, 0xcf, 0x01, 0x7b, 0x45, 0x57, 0x58, 0x87];
     let ret = unsafe {
         crypto_pwhash_scryptsalsa208sha256_ll(password.as_ptr(),
-                                              password.len() as size_t,
+                                              password.len() as c_ulonglong,
                                               salt.as_ptr(),
-                                              salt.len() as size_t,
+                                              salt.len() as c_ulonglong,
                                               n,
                                               r,
                                               p,
                                               buf.as_mut_ptr(),
-                                              buf.len() as size_t)
+                                              buf.len() as c_ulonglong)
     };
     assert!(ret == 0);
     assert!(buf[0..] == expected[0..]);
@@ -235,14 +235,14 @@ fn test_crypto_pwhash_scryptsalsa208sha256_ll_4() {
                     0xcb, 0xf4, 0x5c, 0x6f, 0xa7, 0x7a, 0x41, 0xa4];
     let ret = unsafe {
         crypto_pwhash_scryptsalsa208sha256_ll(password.as_ptr(),
-                                              password.len() as size_t,
+                                              password.len() as c_ulonglong,
                                               salt.as_ptr(),
-                                              salt.len() as size_t,
+                                              salt.len() as c_ulonglong,
                                               n,
                                               r,
                                               p,
                                               buf.as_mut_ptr(),
-                                              buf.len() as size_t)
+                                              buf.len() as c_ulonglong)
     };
     assert!(ret == 0);
     assert!(buf[0..] == expected[0..]);
